@@ -35,6 +35,38 @@ const EXAMPLES = [
 
 const PROVIDER_OPTIONS: ModelProvider[] = ['openai-compatible', 'local'];
 
+const PYTHON_KEYWORDS = [
+  'if',
+  'else',
+  'elif',
+  'while',
+  'for',
+  'in',
+  'try',
+  'except',
+  'finally',
+  'def',
+  'class',
+  'return',
+  'with',
+  'as',
+  'not',
+  'and',
+  'or',
+  'True',
+  'False',
+  'None',
+  'pass',
+  'break',
+  'continue',
+  'raise',
+] as const;
+
+const PYTHON_BUILTINS = ['print', 'range', 'len', 'int', 'str', 'float', 'list', 'dict'] as const;
+
+const CODE_TOKEN_REGEX =
+  /\b(print|range|len|int|str|float|list|dict)(?=\()|\b(if|else|elif|while|for|in|try|except|finally|def|class|return|with|as|not|and|or|True|False|None|pass|break|continue|raise)\b|\b\d+\.?\d*\b|\+=|-=|\*=|\/=|==|!=|<=|>=|<|>/g;
+
 type TranslateEvent = {
   content?: string;
   done?: boolean;
@@ -73,59 +105,30 @@ function escapeHtml(value: string): string {
 }
 
 function highlightCodeSegment(segment: string): string {
-  const keywords = [
-    'if',
-    'else',
-    'elif',
-    'while',
-    'for',
-    'in',
-    'try',
-    'except',
-    'finally',
-    'def',
-    'class',
-    'return',
-    'with',
-    'as',
-    'not',
-    'and',
-    'or',
-    'True',
-    'False',
-    'None',
-    'pass',
-    'break',
-    'continue',
-    'raise',
-  ];
-  const builtins = ['print', 'range', 'len', 'int', 'str', 'float', 'list', 'dict'];
-  let highlighted = escapeHtml(segment);
+  let result = '';
+  let lastIndex = 0;
 
-  for (const keyword of keywords) {
-    highlighted = highlighted.replace(
-      new RegExp(`\\b(${keyword})\\b`, 'g'),
-      '<span class="code-keyword">$1</span>',
-    );
+  for (const match of segment.matchAll(CODE_TOKEN_REGEX)) {
+    const token = match[0];
+    const index = match.index ?? 0;
+
+    result += escapeHtml(segment.slice(lastIndex, index));
+
+    if ((PYTHON_BUILTINS as readonly string[]).includes(token)) {
+      result += `<span class="code-builtin">${escapeHtml(token)}</span>`;
+    } else if ((PYTHON_KEYWORDS as readonly string[]).includes(token)) {
+      result += `<span class="code-keyword">${escapeHtml(token)}</span>`;
+    } else if (/^\d/u.test(token)) {
+      result += `<span class="code-number">${escapeHtml(token)}</span>`;
+    } else {
+      result += `<span class="code-operator">${escapeHtml(token)}</span>`;
+    }
+
+    lastIndex = index + token.length;
   }
 
-  for (const builtin of builtins) {
-    highlighted = highlighted.replace(
-      new RegExp(`\\b(${builtin})(\\()`, 'g'),
-      '<span class="code-builtin">$1</span>$2',
-    );
-  }
-
-  highlighted = highlighted.replace(
-    /\b(\d+\.?\d*)\b/g,
-    '<span class="code-number">$1</span>',
-  );
-  highlighted = highlighted.replace(
-    /(\+=|-=|\*=|\/=|==|!=|&lt;=|&gt;=|&lt;|&gt;)/g,
-    '<span class="code-operator">$1</span>',
-  );
-
-  return highlighted;
+  result += escapeHtml(segment.slice(lastIndex));
+  return result;
 }
 
 function highlightLine(line: string): string {
@@ -609,7 +612,7 @@ else:
         </section>
 
         <footer className="flex flex-col gap-3 border-t border-border py-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <span>人话.py</span>
+          <span>人话.py - 输出不需要能跑，但必须有趣</span>
           <div className="flex items-center gap-2">
             <a
               href="https://github.com/Chatbot-zhou/renhua.py"
