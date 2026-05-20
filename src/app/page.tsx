@@ -5,6 +5,7 @@ import {
   ArrowRight,
   Check,
   Copy,
+  Github,
   RefreshCw,
   Settings2,
   Square,
@@ -157,6 +158,28 @@ function highlightPython(code: string): string {
     .split('\n')
     .map((line) => highlightLine(line))
     .join('\n');
+}
+
+function GiteeIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="size-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6.6 4.5h10.8a2.1 2.1 0 0 1 2.1 2.1v10.8a2.1 2.1 0 0 1-2.1 2.1H6.6a2.1 2.1 0 0 1-2.1-2.1V6.6a2.1 2.1 0 0 1 2.1-2.1Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M8.1 12a3.9 3.9 0 0 1 3.9-3.9h3.9v3.1H12a.8.8 0 0 0-.8.8v.1c0 .4.4.8.8.8h3.9v3H12A3.9 3.9 0 0 1 8.1 12Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
 }
 
 export default function HomePage() {
@@ -584,6 +607,32 @@ else:
             </div>
           </section>
         </section>
+
+        <footer className="flex flex-col gap-3 border-t border-border py-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <span>人话.py</span>
+          <div className="flex items-center gap-2">
+            <a
+              href="https://github.com/Chatbot-zhou/renhua.py"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="GitHub 仓库"
+              title="GitHub 仓库"
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-secondary/40 text-muted-foreground transition hover:border-primary/60 hover:text-foreground"
+            >
+              <Github className="size-4" aria-hidden="true" />
+            </a>
+            <a
+              href="https://gitee.com/chatbotzhou/renhua.py"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Gitee 仓库"
+              title="Gitee 仓库"
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-secondary/40 text-muted-foreground transition hover:border-primary/60 hover:text-foreground"
+            >
+              <GiteeIcon />
+            </a>
+          </div>
+        </footer>
       </div>
     </main>
   );
